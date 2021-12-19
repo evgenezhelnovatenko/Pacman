@@ -62,9 +62,14 @@ sf::Vector2f BaseEntity::speedVec()
 	return m_speedVec;
 }
 
-void BaseEntity::updateSpeedVec()
+void BaseEntity::updateSpeedVec(sf::Vector2f speedVec)
 {
-	switch (m_direction)
+	if (m_speedVec == speedVec)
+		return;
+
+	m_speedVec = speedVec;
+
+	/*switch (m_direction)
 	{
 	case Direction::RIGHT:
 		m_speedVec = sf::Vector2f(1, 0) * m_speed;
@@ -80,8 +85,9 @@ void BaseEntity::updateSpeedVec()
 		break;
 	default:
 		break;
-	}
+	}*/
 }
+
 
 void BaseEntity::moveTo(sf::Vector2f newCoords)
 {

@@ -18,7 +18,7 @@ public:
 	float speed();
 	void setSpeed(float speed);
 	sf::Vector2f speedVec();
-	void updateSpeedVec();
+	void updateSpeedVec(sf::Vector2f speedVec);
 
 	void moveTo(sf::Vector2f newCoords);
 

@@ -77,6 +77,7 @@ sf::Vector2f getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u sprit
 	return entityCoords;
 }
 
+// Нахождение задней угловой точки относительно текущего и в зависимости от следующего направления сущьности.
 sf::Vector2f getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection) {
 
 	sf::Vector2f requiredPoint = spriteCoords;
@@ -118,6 +119,7 @@ sf::Vector2f getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords,
 	return requiredPoint;
 }
 
+// Нахождение передней угловой точки относительно текущего и в зависимости от следующего направления сущьности.
 sf::Vector2f getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection) {
 
 	sf::Vector2f requiredPoint = spriteCoords;
@@ -161,7 +163,7 @@ sf::Vector2f getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords
 int main()
 {
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(512, 256), "Pac-man");
+	sf::RenderWindow window(sf::VideoMode(512, 400), "Pac-man");
 	window.setFramerateLimit(20);
 
 
@@ -170,10 +172,13 @@ int main()
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
 		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
-		12,	22,	11,	20,	20,	20,	20, 20, 20, 20, 20, 20, 20, 9,	22, 13,
-		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 17,	22, 13,
-		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 17,	22, 13,
-		12,	22,	10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 8,	22, 13,
+		12,	22,	3,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 1,	22, 13,
+		12,	22,	13,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 12,	22, 13,
+		12,	22,	2,	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0,	22, 13,
+		12,	22,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,	22, 13,
+		12,	22,	3,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 1,	22, 13,
+		12,	22,	13,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 12,	22, 13,
+		12,	22,	2,	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0,	22, 13,
 		12,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 13,
 		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
 	};
@@ -189,11 +194,11 @@ int main()
 		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
 	};
 
-	std::vector<TileMap*> levels; // Вектор с массивами уровней.
+	std::vector<TileMap*> levels; // Вектор с уровнями.
 	int levelNumber = 1; // Номер текущего уровня.
 
 	// Наполняем вектор уровней создаными картами.
-	levels.push_back(new TileMap(sf::Vector2u(30, 30), level_1, 16, 8));
+	levels.push_back(new TileMap(sf::Vector2u(30, 30), level_1, 16, 11));
 	levels.push_back(new TileMap(sf::Vector2u(30, 30), level_2, 16, 8));
 
 	// Загружаем для каждого уровня спрайтлист. Если хоть один спрайтлист не загрузиться - программа закончит роботу.
@@ -235,9 +240,11 @@ int main()
 					
 					if (pacman.direction() == Direction::UP || pacman.direction() == Direction::DOWN)
 						pacman.setNextDirection(Direction::LEFT);
-					else {
+					else if (pacman.direction() == Direction::RIGHT) {
 						pacman.setDirection(Direction::LEFT);
-						pacman.updateSpeedVec();
+						pacman.updateSpeedVec(createSpeedVec(pacman.speed(), pacman.direction()));
+						if (pacman.nextDirection() != -1)
+							pacman.setNextDirection(-1);
 					}
 
 					if (pacman.isStandStill()) 
@@ -247,9 +254,11 @@ int main()
 				case sf::Keyboard::Right:
 					if (pacman.direction() == Direction::UP || pacman.direction() == Direction::DOWN)
 						pacman.setNextDirection(Direction::RIGHT);
-					else {
+					else if (pacman.direction() == Direction::LEFT) {
 						pacman.setDirection(Direction::RIGHT);
-						pacman.updateSpeedVec();
+						pacman.updateSpeedVec(createSpeedVec(pacman.speed(), pacman.direction()));
+						if (pacman.nextDirection() != -1)
+							pacman.setNextDirection(-1);
 					}
 
 					if (pacman.isStandStill())
@@ -258,9 +267,11 @@ int main()
 				case sf::Keyboard::Up:
 					if (pacman.direction() == Direction::LEFT || pacman.direction() == Direction::RIGHT)
 						pacman.setNextDirection(Direction::UP);
-					else {
+					else if (pacman.direction() == Direction::DOWN) {
 						pacman.setDirection(Direction::UP);
-						pacman.updateSpeedVec();
+						pacman.updateSpeedVec(createSpeedVec(pacman.speed(), pacman.direction()));
+						if (pacman.nextDirection() != -1)
+							pacman.setNextDirection(-1);
 					}
 
 					if (pacman.isStandStill())
@@ -269,9 +280,11 @@ int main()
 				case sf::Keyboard::Down:
 					if (pacman.direction() == Direction::LEFT || pacman.direction() == Direction::RIGHT)
 						pacman.setNextDirection(Direction::DOWN);
-					else {
+					else if (pacman.direction() == Direction::UP) {
 						pacman.setDirection(Direction::DOWN);
-						pacman.updateSpeedVec();
+						pacman.updateSpeedVec(createSpeedVec(pacman.speed(), pacman.direction()));
+						if (pacman.nextDirection() != -1)
+							pacman.setNextDirection(-1);
 					}
 
 					if (pacman.isStandStill())
@@ -283,7 +296,6 @@ int main()
 				
 				break;
 
-				// we don't process other types of events
 			default:
 				break;
 			}
@@ -294,27 +306,32 @@ int main()
 
 			sf::Vector2f newPacmanCoords;
 			sf::Vector2f coordsToCheck;
+			sf::Vector2f nextSpeedVec;
 
-			if (pacman.nextDirection() != -1) {
+			if (pacman.nextDirection() != -1) { // Если у пакмена задано слейдующее, после текущего направление, то проверяем может ли пакмен повернуть в сторону слейдующего направления.
 
 				bool canGo = true;
-				newPacmanCoords = getNewCoords(pacman.coords(), createSpeedVec(pacman.speed(), pacman.nextDirection()));
-				coordsToCheck = getABackPointInTheDirectionOfTheNextTurn(newPacmanCoords, pacman.spriteSize(), pacman.direction(), pacman.nextDirection());
+				nextSpeedVec = createSpeedVec(pacman.speed(), pacman.nextDirection());
+				newPacmanCoords = getNewCoords(pacman.coords(), nextSpeedVec); // Будущие координаты пакмена.
+				coordsToCheck = getABackPointInTheDirectionOfTheNextTurn(newPacmanCoords, pacman.spriteSize(), pacman.direction(), pacman.nextDirection()); // Координаты задней точки относительно будущих координат пакмена.
+																																							// Это точка для проверки того, долшла ли задняя часть пакмена до поворота.
 
+				// Если точка для проверки наткнулась на препятствие, то canGo становиться false.
 				if (isThereAnObstacleOnTheCoords(*currentMap, coordsToCheck))
 					canGo = false;
 
+				// Если Пакмен не наткнулся на препятствие задней точкой - проверяем переднюю.
 				if (canGo) {
-					coordsToCheck = getAFrontPointInTheDirectionOfTheNextTurn(newPacmanCoords, pacman.spriteSize(), pacman.direction(), pacman.nextDirection());
-					if (isThereAnObstacleOnTheCoords(*currentMap, coordsToCheck))
+					coordsToCheck = getAFrontPointInTheDirectionOfTheNextTurn(newPacmanCoords, pacman.spriteSize(), pacman.direction(), pacman.nextDirection()); // Коориднаты передней точки относительно будущих координат пакмена.
+					if (isThereAnObstacleOnTheCoords(*currentMap, coordsToCheck)) // Если передняя точка наткнулась на препятствие, то canGo становиться false.
 						canGo = false;
 				}
 
-
+				// Если canGo == true, значит пакмен пожет повернуть.
 				if (canGo) {
-					pacman.updateTheCurrentDirectionToTheNext();
-					pacman.updateSpeedVec();
-					pacman.moveTo(newPacmanCoords);
+					pacman.updateTheCurrentDirectionToTheNext(); // Заменяем текущее направление на следующее и очищаем следующее направление.
+					pacman.updateSpeedVec(nextSpeedVec); // Обновляем вектор скорости.
+					//pacman.moveTo(newPacmanCoords); // Задаём пакмену новые координаты (двигаем его).
 				}
 			}
 
@@ -336,22 +353,28 @@ int main()
 			// Иначе двигаем его по новым кооридинатам.
 			pacman.moveTo(newPacmanCoords);
 			
+			// Проверка на то, стоит ли Пакмен после проверки на перемещение. Если да, то кадр анимации не сменяется, если нет - сменяется.
+			if (!pacman.isStandStill()) {
+				// Изменение счётчика кадров анимации.
+				if (++animationCounter > 3)
+					animationCounter = 0;
 
-			// Изменение счётчика кадров анимации.
-			if (++animationCounter > 3)
-				animationCounter = 0;
-
-			// Меням координаты спрайта, который нужно использовать, на текстуре.
-			pacman.changeTextureRect(sf::IntRect(pacman.spriteSize().x * animationCounter,
-				pacman.spriteSize().y * pacman.direction(), 
-				pacman.spriteSize().x,
-				pacman.spriteSize().y));
+				// Меням координаты спрайта, который нужно использовать, на текстуре.
+				pacman.changeTextureRect(sf::IntRect(pacman.spriteSize().x * animationCounter,
+					pacman.spriteSize().y * pacman.direction(),
+					pacman.spriteSize().x,
+					pacman.spriteSize().y));
+			}
 		}
 		
-		// draw the map
+		
+		// Очищаем окно.
 		window.clear();
+		// Рисуем уровень.
 		window.draw(*currentMap);
+		// Рисуем пакмена.
 		window.draw(pacman);
+
 		window.display();
 	}
 

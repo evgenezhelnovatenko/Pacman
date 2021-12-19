@@ -11,10 +11,10 @@ Pacman::Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, int speed, int dire
 	m_nextDirection = -1;
 	m_spriteSize = spriteSize;
 	m_isStandStill = true;
+	m_speed = speed;
 	
-	setSpeed(speed);
-	updateSpeedVec();
-	setPosition(coords);
+	updateSpeedVec(speedVec);
+	setPosition(m_coords);
 }
 
 bool Pacman::isStandStill()
