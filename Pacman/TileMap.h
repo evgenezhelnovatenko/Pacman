@@ -10,7 +10,7 @@ public:
 
     bool load(const std::string& tileset);
     int getTileNumber(sf::Vector2f coords) const;
-    int getTileValue(int tileNumber) const;
+    int getTileValue(const int &tileNumber) const;
     sf::Vector2f getTileCoords(int tileNumber);
 
 

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="BaseEntity.cpp" />
     <ClCompile Include="Pacman.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="BaseEntity.h" />
     <ClInclude Include="Direction.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="TileMap.h" />
   </ItemGroup>

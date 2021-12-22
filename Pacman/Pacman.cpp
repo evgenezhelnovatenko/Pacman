@@ -4,7 +4,7 @@ Pacman::Pacman()
 {
 }
 
-Pacman::Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, int speed, int direction, sf::Vector2f speedVec)
+Pacman::Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, float speed, int direction, sf::Vector2f speedVec)
 {
 	m_coords = coords;
 	m_direction = direction;

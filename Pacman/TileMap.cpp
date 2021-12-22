@@ -1,4 +1,5 @@
 #include "TileMap.h"
+#include <iostream>
 
 TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height) {
 
@@ -7,6 +8,7 @@ TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned
     m_width = width;
     m_height = height;
 }
+
 
 bool TileMap::load(const std::string& tileset)
 {
@@ -59,8 +61,13 @@ int TileMap::getTileNumber(sf::Vector2f coords) const
     return i * m_width + j;
 }
 
-int TileMap::getTileValue(int tileNumber) const
+int TileMap::getTileValue(const int &tileNumber) const
 {
+    if (tileNumber < 0 || tileNumber >= m_width * m_height) {
+        std::cout << "Выход за границы карты";
+        return -1;
+    }
+
     return m_tiles[tileNumber];
 }
 

@@ -6,7 +6,7 @@ class Pacman : public BaseEntity
 
 public:
 	Pacman();
-	Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, int speed, int direction, sf::Vector2f speedVec);
+	Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, float speed, int direction, sf::Vector2f speedVec);
 
 	bool isStandStill();
 	void setIsStandStill(bool isStandStill);
