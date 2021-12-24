@@ -4,23 +4,31 @@
 
 #include "TileMap.h"
 #include "Pacman.h"
+#include "Ghost.h"
 
+
+#define MOVE_SPEED 100.0
 #define ANIMATION_SPEED 6
+#define SPRITE_WIDTH 30
+#define SPRITE_HEIGHT 30
+
 
 class Game
 {
 public:
-	Game();
+	Game(std::string mapTileset, std::string pacmanSpriteSet, std::string ghostsSpriteSet);
 	~Game();
 
+	bool setup();
+	void levelPreparation(int levelNumb);
+	
 	void addLevel(TileMap* newLevel);
-	bool loadTilesetForEveryLevel(std::string tileset);
 	TileMap* currentLevel();
 	void goToTheNextLevel();
 	void goToThePreviousLevel();
 	void setIsWindowOpen(bool isWindowOpen);
-	void setPacman(Pacman* pacman);
-	Pacman*& pacman();
+	Pacman* pacman();
+	Ghost** ghosts();
 	void restartAClock();
 	sf::Time getElapsedTime();
 	void changePacmanTextureRect();
@@ -35,24 +43,38 @@ public:
 	static sf::Vector2f getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
 	static sf::Vector2f getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
 	
-
-	
+	static const int GHOST_COUNT{ 4 };
 
 private:
 
 	void logic();
 	void animation();
+	bool loadTextures();
+	void loadSprites();
+	bool loadMapForLvl(int levelNumb);
+	void unloadMapFromLvl(int levelNumb);
+	void pacmanSetupForLvl(int levelNumb);
+	void ghostsSetupForLvl(int levelNumb);
 
 	std::vector<TileMap*> m_levels; // Вектор с уровнями.
+	std::string m_mapTileset; // Имя файла спрайтлиста уровня.
+	std::string m_pacmanSpriteSet; // Имя файла спрайтлиста Пакмена.
+	std::string m_ghostsSpriteSet; // Имя файла спрайтлиста Призраков.
+	sf::Texture m_mapTilesetTexture;
+	sf::Texture m_mapPacmanSetTexture;
+	sf::Texture m_mapGhostsSetTexture;
 	int m_levelNumber; // Номер текущего уровня.
 	int m_animationCounter; // Счётчик кадров анимации.
-	bool m_isWindowOpen;
+	bool m_isWindowOpen; // Флаг, который говорит открыто ли окно программы.
 
 	Pacman* m_pacman;
+	Ghost** m_ghosts;
+
 	sf::Thread m_logicThread;
 	sf::Thread m_animationThread;
 	sf::Mutex m_mutex;
 	sf::Clock moveClock;
 	sf::Clock animationClock;
+
 };
 

@@ -1,14 +1,9 @@
 #include "BaseEntity.h"
 
-bool BaseEntity::loadSprite(const std::string& pathToTheTexture)
+void BaseEntity::loadSprite()
 {
-	if (!m_texture.loadFromFile(pathToTheTexture))
-		return false;
-
-	m_sprite.setTexture(m_texture);
+	m_sprite.setTexture(*m_texture);
 	m_sprite.setTextureRect(sf::IntRect(0, 0, m_spriteSize.x, m_spriteSize.y));
-
-	return true;
 }
 
 void BaseEntity::changeTextureRect(sf::IntRect rect)
@@ -16,10 +11,13 @@ void BaseEntity::changeTextureRect(sf::IntRect rect)
 	m_sprite.setTextureRect(rect);
 }
 
-//sf::Vector2f BaseEntity::getNewCoords()
-//{
-//	return m_coords + m_speedVec;
-//}
+void BaseEntity::setTexture(sf::Texture* texture)
+{
+	if (m_texture == texture)
+		return;
+
+	m_texture = texture;
+}
 
 sf::Vector2u BaseEntity::spriteSize()
 {
@@ -29,6 +27,15 @@ sf::Vector2u BaseEntity::spriteSize()
 sf::Vector2f BaseEntity::coords()
 {
 	return m_coords;
+}
+
+void BaseEntity::setCoords(sf::Vector2f coords)
+{
+	if (m_coords == coords)
+		return;
+
+	m_coords = coords;
+	setPosition(m_coords);
 }
 
 int BaseEntity::direction()
@@ -68,24 +75,6 @@ void BaseEntity::updateSpeedVec(sf::Vector2f speedVec)
 		return;
 
 	m_speedVec = speedVec;
-
-	/*switch (m_direction)
-	{
-	case Direction::RIGHT:
-		m_speedVec = sf::Vector2f(1, 0) * m_speed;
-		break;
-	case Direction::LEFT:
-		m_speedVec = sf::Vector2f(-1, 0) * m_speed;
-		break;
-	case Direction::UP:
-		m_speedVec = sf::Vector2f(0, -1) * m_speed;
-		break;
-	case Direction::DOWN:
-		m_speedVec = sf::Vector2f(0, 1) * m_speed;
-		break;
-	default:
-		break;
-	}*/
 }
 
 
@@ -100,7 +89,7 @@ void BaseEntity::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 	states.transform *= getTransform();
 
-	states.texture = &m_texture;
+	states.texture = m_texture;
 
 	target.draw(m_sprite, states);
 }

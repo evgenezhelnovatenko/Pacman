@@ -1,23 +1,28 @@
 #include "TileMap.h"
 #include <iostream>
 
-TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height) {
+TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height, EntityParams* pacmanParams, EntityParams* ghostsParams)
+    : m_tiles{tiles}
+    , m_tileset{nullptr}
+    , m_tileSize{tileSize}
+    , m_width{width}
+    , m_height{height}
+{
+    m_pacmanParams = pacmanParams;
+    m_ghostsParams = ghostsParams;
+}
 
-    m_tiles = tiles;
-    m_tileSize = tileSize;
-    m_width = width;
-    m_height = height;
+void TileMap::setTexture(sf::Texture* texture)
+{
+    if (m_tileset == texture)
+        return;
+
+    m_tileset = texture;
 }
 
 
-bool TileMap::load(const std::string& tileset)
-{
-    // load the tileset texture
-    if (!m_tileset.loadFromFile(tileset))
-        return false;
-
-    
-
+bool TileMap::load()
+{ 
     // resize the vertex array to fit the level size
     m_vertices.setPrimitiveType(sf::Quads);
     m_vertices.resize(m_width * m_height * 4);
@@ -30,8 +35,8 @@ bool TileMap::load(const std::string& tileset)
             int tileNumber = m_tiles[i + j * m_width];
 
             // find its position in the tileset texture
-            int tu = tileNumber % (m_tileset.getSize().x / m_tileSize.x);
-            int tv = tileNumber / (m_tileset.getSize().x / m_tileSize.x);
+            int tu = tileNumber % (m_tileset->getSize().x / m_tileSize.x);
+            int tv = tileNumber / (m_tileset->getSize().x / m_tileSize.x);
 
             // get a pointer to the current tile's quad
             sf::Vertex* quad = &m_vertices[(i + j * m_width) * 4];
@@ -52,6 +57,13 @@ bool TileMap::load(const std::string& tileset)
     return true;
 }
 
+void TileMap::unload()
+{
+    m_vertices.clear();
+    delete m_tileset;
+    m_tileset = nullptr;
+}
+
 int TileMap::getTileNumber(sf::Vector2f coords) const
 {
     int i = coords.y / m_tileSize.y;
@@ -64,7 +76,7 @@ int TileMap::getTileNumber(sf::Vector2f coords) const
 int TileMap::getTileValue(const int &tileNumber) const
 {
     if (tileNumber < 0 || tileNumber >= m_width * m_height) {
-        std::cout << "Выход за границы карты";
+        std::cout << "Going beyond the boundaries of the map ";
         return -1;
     }
 
@@ -79,13 +91,31 @@ sf::Vector2f TileMap::getTileCoords(int tileNumber)
     return sf::Vector2f(j * m_tileSize.x, i * m_tileSize.y);
 }
 
+EntityParams* TileMap::pacmanParams()
+{
+    return m_pacmanParams;
+}
+
+EntityParams* TileMap::ghostsParams()
+{
+    return m_ghostsParams;
+}
+
+void TileMap::setup()
+{
+    
+}
+
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    if (m_tileset == nullptr || m_vertices.getVertexCount() == 0)
+        return;
+
     // apply the transform
     states.transform *= getTransform();
 
     // apply the tileset texture
-    states.texture = &m_tileset;
+    states.texture = m_tileset;
 
     // draw the vertex array
     target.draw(m_vertices, states);

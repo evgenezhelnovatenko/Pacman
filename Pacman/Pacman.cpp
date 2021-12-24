@@ -1,16 +1,26 @@
 #include "Pacman.h"
 
 Pacman::Pacman()
+	: m_isStandStill{ true }
 {
+
+}
+
+Pacman::Pacman(sf::Vector2u spriteSize, float speed)
+	: m_isStandStill{ true }
+{
+	m_nextDirection = -1;
+	m_spriteSize = spriteSize;
+	m_speed = speed;
 }
 
 Pacman::Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, float speed, int direction, sf::Vector2f speedVec)
+	: m_isStandStill{true}
 {
 	m_coords = coords;
 	m_direction = direction;
 	m_nextDirection = -1;
 	m_spriteSize = spriteSize;
-	m_isStandStill = true;
 	m_speed = speed;
 	
 	updateSpeedVec(speedVec);

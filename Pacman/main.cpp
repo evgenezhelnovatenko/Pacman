@@ -4,23 +4,23 @@
 #include <functional>
 
 #include "SFML/Graphics.hpp"
+
 #include "Game.h"
-#include "TileMap.h"
-#include "Pacman.h"
 #include "Direction.h"
 
 #define PACMAN_SPEED 100.f
 
+
 int main()
 {
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(512, 400), "Pac-man");
+	sf::RenderWindow window(sf::VideoMode(512, 450), "Pac-man");
 	window.setFramerateLimit(60);
 
-	Game game;
+	Game game("images/map_tileset.png", "images/pacman_spriteSet.png", "images/ghosts_spriteSet.png");
 
 	// Объявление уровней, которые состоят из массивов индексов спрайтов.
-	int level_1[] =
+	int level1[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
 		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
@@ -28,13 +28,22 @@ int main()
 		12,	22,	13,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 12,	22, 13,
 		12,	22,	2,	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0,	22, 13,
 		12,	22,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,	22, 13,
-		12,	22,	3,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 1,	22, 13,
-		12,	22,	13,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 12,	22, 13,
-		12,	22,	2,	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0,	22, 13,
-		12,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 13,
-		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
+		6,	1,	22,	3,	15, 15, 15, 1,	3,	15, 15, 15, 1,	22,	3,	4,
+		22,	12,	22,	13, 22, 22, 22, 12, 13, 22, 22, 22, 12,	22,	13, 22,
+		22,	12,	22,	13, 14, 14, 14, 12, 13, 14, 14, 14, 12, 22,	13, 22,
+		22,	12,	22,	2,	14, 14, 14, 0,	2,	14, 14, 14, 0,	22, 13, 22,
+		22,	12,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	13,	22,
+		22,	12,	22, 22, 22,	3,	15,	15,	15,	15,	1,	22, 22, 22,	13,	22,
+		22,	6,	15,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,	4,	22,
 	};
-	int level_2[] =
+	EntityParams ghostsPrmsForLvl1[] = {
+		EntityParams(sf::Vector2f(180, 60), Direction::RIGHT),
+		EntityParams(sf::Vector2f(200, 60), Direction::LEFT),
+		EntityParams(sf::Vector2f(180, 90), Direction::UP),
+		EntityParams(sf::Vector2f(200, 90), Direction::DOWN)
+	};
+
+	int level2[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
 		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
@@ -45,24 +54,20 @@ int main()
 		12,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 13,
 		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
 	};
+	EntityParams ghostsPrmsForLvl2[] = {
+		EntityParams(sf::Vector2f(180, 60), Direction::RIGHT),
+		EntityParams(sf::Vector2f(200, 60), Direction::LEFT),
+		EntityParams(sf::Vector2f(180, 90), Direction::UP),
+		EntityParams(sf::Vector2f(200, 90), Direction::DOWN)
+	};
 
-	// Созадние объекта Пакмена и загрузка спрайтлиста для него. Если спрайтлист не загрузиться - программа закончит роботу.
-	Pacman* pacman = new Pacman(sf::Vector2f(30, 30), sf::Vector2u(30, 30), PACMAN_SPEED, Direction::RIGHT, Game::createSpeedVec(PACMAN_SPEED, Direction::RIGHT));
-	if (!pacman->loadSprite("images/PacmanSprite_30x30.png"))
-	{
-		return -1;
-	}
+	game.addLevel(new TileMap(sf::Vector2u(30, 30), level1, 16, 13, new EntityParams(sf::Vector2f(30, 30), Direction::RIGHT), ghostsPrmsForLvl1));
+	game.addLevel(new TileMap(sf::Vector2u(30, 30), level2, 16, 8, new EntityParams(sf::Vector2f(200, 30), Direction::RIGHT), ghostsPrmsForLvl2));
 
-	game.addLevel(new TileMap(sf::Vector2u(30, 30), level_1, 16, 11));
-	game.addLevel(new TileMap(sf::Vector2u(30, 30), level_2, 16, 8));
-
-	// Загружаем для каждого уровня спрайтлист. Если хоть один спрайтлист не загрузиться - программа закончит роботу.
-	if (!game.loadTilesetForEveryLevel("images/map_tileset.png"))
+	if (!game.setup())
 		return -1;
 
-	game.setPacman(pacman);
-
-	TileMap* currentMap = game.currentLevel(); // Указатель на текущий уровень.
+	Pacman* pacman = game.pacman();
 
 	game.startLogicThread();
 
@@ -150,10 +155,8 @@ int main()
 
 		}
 
-
-		// Игровая логика.
-		
-
+		TileMap* currentMap = game.currentLevel(); // Указатель на текущий уровень.
+		Ghost** ghosts = game.ghosts();
 		
 		// Очищаем окно.
 		window.clear();
@@ -161,14 +164,16 @@ int main()
 		window.draw(*currentMap);
 		// Рисуем пакмена.
 		window.draw(*pacman);
+		std::cout << "x: " << pacman->coords().x << "; y: " << pacman->coords().y << std::endl;
+		// Рисуем призраков.
+		for (int i = 0; i < Game::GHOST_COUNT; i++) {
+			window.draw(*(ghosts[i]));
+		}
 
 		window.display();
 	}
 
 	game.setIsWindowOpen(false);
-
-	
-	delete pacman;
 
 	return 0;
 }

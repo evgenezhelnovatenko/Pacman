@@ -8,11 +8,13 @@ class BaseEntity : public sf::Drawable, public sf::Transformable
 {
 
 public:
-	bool loadSprite(const std::string& pathToTheTexture);
+	void loadSprite();
 	void changeTextureRect(sf::IntRect rect);
+	void setTexture(sf::Texture* texture);
 	//sf::Vector2f getNewCoords();
 	sf::Vector2u spriteSize();
 	sf::Vector2f coords();
+	void setCoords(sf::Vector2f coords);
 	int direction();
 	void setDirection(int direction);
 	float speed();
@@ -28,11 +30,12 @@ protected:
 
 
 	sf::Sprite m_sprite;
-	sf::Texture m_texture;
+	sf::Texture* m_texture;
 	sf::Vector2u m_spriteSize;
 	sf::Vector2f m_coords;
 	float m_speed;
 	sf::Vector2f m_speedVec;
 	int m_direction;
+	int m_nextDirection;
 };
 

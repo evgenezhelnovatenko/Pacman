@@ -2,22 +2,58 @@
 
 #include <functional>
 
+const int Game::GHOST_COUNT;
 
-Game::Game()
-	: m_levelNumber{ 1 }
+Game::Game(std::string mapTileset, std::string pacmanSpriteSet, std::string ghostsSpriteSet)
+	: m_mapTileset{ mapTileset }
+	, m_pacmanSpriteSet{ pacmanSpriteSet }
+	, m_ghostsSpriteSet{ ghostsSpriteSet }
+	, m_levelNumber{ 1 }
 	, m_animationCounter{ 0 }
 	, m_isWindowOpen{ true }
-	, m_pacman{ nullptr }
+	, m_pacman{ new Pacman(sf::Vector2u(SPRITE_WIDTH, SPRITE_HEIGHT), MOVE_SPEED) }
+	, m_ghosts{ new Ghost*[GHOST_COUNT] }
 	, m_logicThread(&Game::logic, this)
 	, m_animationThread(&Game::animation, this)
 {
-
+	for (int i = 0; i < GHOST_COUNT; i++) {
+		m_ghosts[i] = new Ghost(sf::Vector2u(SPRITE_WIDTH, SPRITE_HEIGHT), MOVE_SPEED);
+	}
 }
 
 Game::~Game()
 {
 	for (int i = 0; i < m_levels.size(); i++)
 		delete m_levels.at(i);
+
+	delete m_pacman;
+
+	for (int i = 0; i < GHOST_COUNT; i++) {
+		delete m_ghosts[i];
+	}
+
+	delete[] m_ghosts;
+}
+
+// Настройки игры перед запуском.
+bool Game::setup()
+{
+	if (!loadTextures())
+		return false;
+
+	loadSprites();
+
+	levelPreparation(m_levelNumber);
+
+	return true;
+}
+
+// Подготовка уровня.
+void Game::levelPreparation(int levelNumb)
+{
+	loadMapForLvl(levelNumb);
+	pacmanSetupForLvl(levelNumb);
+	ghostsSetupForLvl(levelNumb);
 }
 
 void Game::addLevel(TileMap* newLevel)
@@ -25,20 +61,12 @@ void Game::addLevel(TileMap* newLevel)
 	m_levels.push_back(newLevel);
 }
 
-bool Game::loadTilesetForEveryLevel(std::string tileset)
-{
-	for (int i = 0; i < m_levels.size(); i++) {
-		if (!m_levels.at(i)->load(tileset))
-			return false;
-	}
-}
-
 TileMap* Game::currentLevel()
 {
 	return m_levels.at(m_levelNumber - 1);
 }
 
-
+// Изменение номера текущего уровня на следующий (если такой имеется).
 void Game::goToTheNextLevel()
 {
 	if (m_levelNumber >= m_levels.size()) {
@@ -48,6 +76,7 @@ void Game::goToTheNextLevel()
 	m_levelNumber++;
 }
 
+// Изменение номера текущего уровня на предыдущий (если такой имеется).
 void Game::goToThePreviousLevel()
 {
 	if (m_levelNumber - 1 <= 0) {
@@ -66,24 +95,23 @@ void Game::setIsWindowOpen(bool isWindowOpen)
 	m_isWindowOpen = isWindowOpen;
 }
 
-void Game::setPacman(Pacman* pacman)
-{
-	if (m_pacman == pacman)
-		return;
-
-	m_pacman = pacman;
-}
-
-Pacman*& Game::pacman()
+Pacman* Game::pacman()
 {
 	return m_pacman;
 }
 
+Ghost** Game::ghosts()
+{
+	return m_ghosts;
+}
+
+// Перезапустить часы.
 void Game::restartAClock()
 {
 	moveClock.restart();
 }
 
+// Получить время, пройденое с момента запуска или перезапуска часов.
 sf::Time Game::getElapsedTime()
 {
 	return moveClock.getElapsedTime();
@@ -99,16 +127,19 @@ void Game::changePacmanTextureRect()
 	m_mutex.unlock();
 }
 
+// Запустить поток с логикой игры.
 void Game::startLogicThread()
 {
 	m_logicThread.launch();
 }
 
+// Запустить поток с анимацией.
 void Game::startAnimationThread()
 {
 	m_animationThread.launch();
 }
 
+// Вся логика игры (находиться в отдельном потоке m_logicThread).
 void Game::logic() {
 
 	startAnimationThread();
@@ -183,6 +214,7 @@ void Game::logic() {
 
 }
 
+// Метод который отвечает за анимацию (работает в отдельном потоке m_animationThread).
 void Game::animation()
 {
 	while (m_isWindowOpen)
@@ -204,6 +236,72 @@ void Game::animation()
 
 }
 
+// Загрузка всех текстур.
+bool Game::loadTextures()
+{
+	if (!m_mapTilesetTexture.loadFromFile(m_mapTileset))
+		return false;
+	if (!m_mapPacmanSetTexture.loadFromFile(m_pacmanSpriteSet))
+		return false;
+	if (!m_mapGhostsSetTexture.loadFromFile(m_ghostsSpriteSet))
+		return false;
+
+	return true;
+}
+
+void Game::loadSprites()
+{
+	m_pacman->setTexture(&m_mapPacmanSetTexture);
+	m_pacman->loadSprite();
+
+	for (int i = 0; i < GHOST_COUNT; i++) {
+		m_ghosts[i]->setTexture(&m_mapGhostsSetTexture);
+		m_ghosts[i]->loadSprite();
+	}
+}
+
+// Загрузка карты.
+bool Game::loadMapForLvl(int levelNumb)
+{
+	TileMap* level = m_levels.at(levelNumb - 1);
+	level->setTexture(&m_mapTilesetTexture);
+	if (!level->load())
+		return false;
+
+	return true;
+}
+
+// Выгрузка карты.
+void Game::unloadMapFromLvl(int levelNumb)
+{
+	m_levels.at(levelNumb - 1)->unload();
+}
+
+// Настройка Пакмена.
+void Game::pacmanSetupForLvl(int levelNumb)
+{
+	TileMap* level = m_levels.at(levelNumb - 1);
+	EntityParams* pacmanPrms = level->pacmanParams();
+	m_pacman->setCoords(pacmanPrms->coords);
+	m_pacman->setDirection(pacmanPrms->direction);
+	m_pacman->updateSpeedVec(createSpeedVec(m_pacman->speed(), m_pacman->direction()));
+}
+
+// Настройка Призраков.
+void Game::ghostsSetupForLvl(int levelNumb)
+{
+	TileMap* level = m_levels.at(levelNumb - 1);
+	EntityParams* ghostsPrms = level->ghostsParams();
+	for (int i = 0; i < GHOST_COUNT; i++) {
+		Ghost* ghost = m_ghosts[i];
+		EntityParams* ghostPrms = &ghostsPrms[i];
+
+		ghost->setCoords(ghostPrms->coords);
+		ghost->setDirection(ghostPrms->direction);
+		ghost->updateSpeedVec(createSpeedVec(ghost->speed(), ghost->direction()));
+	}
+}
+
 
 // static methods
 sf::Vector2f Game::getNewCoords(sf::Vector2f currentCoords, sf::Vector2f speedVec)
@@ -211,6 +309,7 @@ sf::Vector2f Game::getNewCoords(sf::Vector2f currentCoords, sf::Vector2f speedVe
 	return currentCoords + speedVec;
 }
 
+// Проверка на то, есть ли по заданым координатам препятствие.
 bool Game::isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords)
 {
 	int tileNumber = map.getTileNumber(coords);
@@ -222,9 +321,10 @@ bool Game::isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords)
 	return false;
 }
 
+// Создание вектора скорости по скорости и направлению.
 sf::Vector2f Game::createSpeedVec(float pixelsPerSecond, int direction)
 {
-	float pixelsInOneHundredthOfASecond = pixelsPerSecond / 100; // находим количество пикселей, на которое надо двигатся каждые 0.1 секунду.
+	float pixelsInOneHundredthOfASecond = pixelsPerSecond / 100; // находим количество пикселей, на которое надо двигатся каждые 0.01 секунду.
 
 	sf::Vector2f speedVec;
 
@@ -249,6 +349,7 @@ sf::Vector2f Game::createSpeedVec(float pixelsPerSecond, int direction)
 	return speedVec;
 }
 
+// Получить центральную переднюю точку спрайта по его координатам, размеру и направлению.
 sf::Vector2f Game::getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u spriteSize, int direction)
 {
 	switch (direction)
@@ -274,6 +375,7 @@ sf::Vector2f Game::getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u
 	return entityCoords;
 }
 
+// Получить заднюю точку спрайта по его следующему направлению, координатам и размеру.
 sf::Vector2f Game::getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection)
 {
 	sf::Vector2f requiredPoint = spriteCoords;
@@ -315,6 +417,7 @@ sf::Vector2f Game::getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteC
 	return requiredPoint;
 }
 
+// Получить переднюю точку спрайта по его следующему направлению, координатам и размеру.
 sf::Vector2f Game::getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection)
 {
 	sf::Vector2f requiredPoint = spriteCoords;
