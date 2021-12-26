@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseEntity.h"
 
+class Game;
+
 class Pacman : public BaseEntity
 {
 
@@ -15,7 +17,11 @@ public:
 	void setNextDirection(int nextDirection);
 	void updateTheCurrentDirectionToTheNext();
 
+	// Inherited via BaseEntity
+	void loadSprite() override;
+
 private:
 	bool m_isStandStill;
+
 };
 

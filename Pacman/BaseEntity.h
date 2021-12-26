@@ -1,14 +1,13 @@
 #pragma once
 
 #include "SFML/Graphics.hpp"
-#include "Direction.h"
+#include "Enums.h"
 #include "TileMap.h"
 
 class BaseEntity : public sf::Drawable, public sf::Transformable
 {
 
 public:
-	void loadSprite();
 	void changeTextureRect(sf::IntRect rect);
 	void setTexture(sf::Texture* texture);
 	//sf::Vector2f getNewCoords();
@@ -27,7 +26,8 @@ public:
 protected:
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
+	virtual void loadSprite() = 0;
+	
 
 	sf::Sprite m_sprite;
 	sf::Texture* m_texture;

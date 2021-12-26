@@ -3,6 +3,7 @@
 #include <functional>
 
 const int Game::GHOST_COUNT;
+sf::Vector2u Game::windowSize;
 
 Game::Game(std::string mapTileset, std::string pacmanSpriteSet, std::string ghostsSpriteSet)
 	: m_mapTileset{ mapTileset }
@@ -17,7 +18,7 @@ Game::Game(std::string mapTileset, std::string pacmanSpriteSet, std::string ghos
 	, m_animationThread(&Game::animation, this)
 {
 	for (int i = 0; i < GHOST_COUNT; i++) {
-		m_ghosts[i] = new Ghost(sf::Vector2u(SPRITE_WIDTH, SPRITE_HEIGHT), MOVE_SPEED);
+		m_ghosts[i] = new Ghost(sf::Vector2u(SPRITE_WIDTH, SPRITE_HEIGHT), MOVE_SPEED, i);
 	}
 }
 
@@ -298,6 +299,7 @@ void Game::ghostsSetupForLvl(int levelNumb)
 
 		ghost->setCoords(ghostPrms->coords);
 		ghost->setDirection(ghostPrms->direction);
+		ghost->changeTextureRect(sf::IntRect(ghost->direction() * ghost->spriteSize().x, ghost->color() * ghost->spriteSize().y, ghost->spriteSize().x, ghost->spriteSize().y));
 		ghost->updateSpeedVec(createSpeedVec(ghost->speed(), ghost->direction()));
 	}
 }
@@ -433,9 +435,10 @@ sf::Vector2f Game::getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f sprite
 
 		if (nextDirection == Direction::UP)
 			requiredPoint.x += spriteSize.x - 1;
-		else if (nextDirection == Direction::DOWN)
+		else if (nextDirection == Direction::DOWN) {
 			requiredPoint.x += spriteSize.x - 1;
-		requiredPoint.y += spriteSize.y - 1;
+			requiredPoint.y += spriteSize.y - 1;
+		}
 		break;
 	case Direction::UP:
 
@@ -458,3 +461,16 @@ sf::Vector2f Game::getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f sprite
 	return requiredPoint;
 }
 
+sf::Vector2f Game::getGlobalPosition(sf::Vector2f currCoords, TileMap* level)
+{
+	int levelWidth = level->widthInPixels();
+	int levelHeight = level->heightInPixels();
+
+	int valueToAddToWidth = (windowSize.x - levelWidth) / 2;
+	int valueToAddToHeight = (windowSize.y - levelHeight) / 2;
+
+	currCoords.x += valueToAddToWidth;
+	currCoords.y += valueToAddToHeight;
+
+	return currCoords;
+}

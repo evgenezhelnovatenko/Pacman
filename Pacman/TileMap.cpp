@@ -91,6 +91,31 @@ sf::Vector2f TileMap::getTileCoords(int tileNumber)
     return sf::Vector2f(j * m_tileSize.x, i * m_tileSize.y);
 }
 
+sf::VertexArray* TileMap::vertices()
+{
+    return &m_vertices;
+}
+
+unsigned int TileMap::width()
+{
+    return m_width;
+}
+
+unsigned int TileMap::height()
+{
+    return m_height;
+}
+
+int TileMap::widthInPixels()
+{
+    return m_width * m_tileSize.x;
+}
+
+int TileMap::heightInPixels()
+{
+    return m_height * m_tileSize.y;
+}
+
 EntityParams* TileMap::pacmanParams()
 {
     return m_pacmanParams;

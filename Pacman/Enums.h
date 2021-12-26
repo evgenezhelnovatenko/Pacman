@@ -6,3 +6,11 @@ enum Direction {
 	UP,
 	DOWN
 };
+
+enum Color {
+	ORANGE,
+	PINK,
+	RED,
+	LIGHTBLUE,
+	BLUE
+};

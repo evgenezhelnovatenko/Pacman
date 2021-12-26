@@ -6,7 +6,7 @@
 #include "SFML/Graphics.hpp"
 
 #include "Game.h"
-#include "Direction.h"
+#include "Enums.h"
 
 #define PACMAN_SPEED 100.f
 
@@ -19,28 +19,30 @@ int main()
 
 	Game game("images/map_tileset.png", "images/pacman_spriteSet.png", "images/ghosts_spriteSet.png");
 
+	Game::windowSize = window.getSize();
+
 	// ќбъ€вление уровней, которые состо€т из массивов индексов спрайтов.
 	int level1[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
 		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
-		12,	22,	3,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 1,	22, 13,
-		12,	22,	13,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 12,	22, 13,
-		12,	22,	2,	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 0,	22, 13,
-		12,	22,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22,	22, 13,
-		6,	1,	22,	3,	15, 15, 15, 1,	3,	15, 15, 15, 1,	22,	3,	4,
-		22,	12,	22,	13, 22, 22, 22, 12, 13, 22, 22, 22, 12,	22,	13, 22,
-		22,	12,	22,	13, 14, 14, 14, 12, 13, 14, 14, 14, 12, 22,	13, 22,
-		22,	12,	22,	2,	14, 14, 14, 0,	2,	14, 14, 14, 0,	22, 13, 22,
-		22,	12,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	13,	22,
-		22,	12,	22, 22, 22,	3,	15,	15,	15,	15,	1,	22, 22, 22,	13,	22,
-		22,	6,	15,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,	4,	22,
+		12,	22,	18,	22, 11, 19, 22, 21, 9,	22, 11, 20, 20, 19,	22, 13,
+		12,	22,	17,	22, 17, 22, 22, 22, 17, 22, 17, 22, 22, 22,	22, 13,
+		12,	22,	17,	22, 17, 22, 22, 22, 17, 22, 17, 22, 11, 19,	22, 13,
+		12,	22,	16,	22, 10, 20, 20, 20, 8,	22, 16, 22, 17, 22,	22, 13,
+		12,	22,	22,	22,	22, 22, 22, 22,	22,	22, 22, 22, 10,	9,	22,	13,
+		12,	22,	11,	20, 20, 20, 20, 20, 20, 20, 9,	22,	22, 17,	22,	13,
+		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 10, 9,	22, 17, 22,	13,
+		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 22, 17, 22, 17,	22,	13,
+		12,	22,	10,	20, 20, 20, 20, 20, 20, 20, 20,	8,	22, 16,	22,	13,
+		12,	22,	22, 22, 22,	22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
+		6,	15,	15,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,	15,	4
 	};
 	EntityParams ghostsPrmsForLvl1[] = {
-		EntityParams(sf::Vector2f(180, 60), Direction::RIGHT),
-		EntityParams(sf::Vector2f(200, 60), Direction::LEFT),
-		EntityParams(sf::Vector2f(180, 90), Direction::UP),
-		EntityParams(sf::Vector2f(200, 90), Direction::DOWN)
+		EntityParams(sf::Vector2f(150, 90), Direction::RIGHT),
+		EntityParams(sf::Vector2f(200, 90), Direction::LEFT),
+		EntityParams(sf::Vector2f(150, 120), Direction::UP),
+		EntityParams(sf::Vector2f(200, 120), Direction::DOWN)
 	};
 
 	int level2[] =
@@ -56,9 +58,9 @@ int main()
 	};
 	EntityParams ghostsPrmsForLvl2[] = {
 		EntityParams(sf::Vector2f(180, 60), Direction::RIGHT),
-		EntityParams(sf::Vector2f(200, 60), Direction::LEFT),
+		EntityParams(sf::Vector2f(230, 60), Direction::LEFT),
 		EntityParams(sf::Vector2f(180, 90), Direction::UP),
-		EntityParams(sf::Vector2f(200, 90), Direction::DOWN)
+		EntityParams(sf::Vector2f(230, 90), Direction::DOWN)
 	};
 
 	game.addLevel(new TileMap(sf::Vector2u(30, 30), level1, 16, 13, new EntityParams(sf::Vector2f(30, 30), Direction::RIGHT), ghostsPrmsForLvl1));
@@ -67,10 +69,24 @@ int main()
 	if (!game.setup())
 		return -1;
 
+	TileMap* currentMap = game.currentLevel(); // ”казатель на текущий уровень.
+
+	sf::VertexArray* mapVertices = currentMap->vertices();
+	for (unsigned int i = 0; i < currentMap->width(); ++i) {
+		for (unsigned int j = 0; j < currentMap->height(); ++j) {
+			sf::Vertex* quad = &(*mapVertices)[(i + j * currentMap->width()) * 4];
+
+			quad[0].position = Game::getGlobalPosition(quad[0].position, game.currentLevel());
+			quad[1].position = Game::getGlobalPosition(quad[1].position, game.currentLevel());
+			quad[2].position = Game::getGlobalPosition(quad[2].position, game.currentLevel());
+			quad[3].position = Game::getGlobalPosition(quad[3].position, game.currentLevel());
+		}
+	}
+
 	Pacman* pacman = game.pacman();
 
 	game.startLogicThread();
-
+	
 	// run the main loop
 	while (window.isOpen())
 	{
@@ -91,57 +107,36 @@ int main()
 				{
 				case sf::Keyboard::Left:
 					
-					if (pacman->direction() == Direction::UP || pacman->direction() == Direction::DOWN)
+					if (pacman->direction() != Direction::LEFT)
 						pacman->setNextDirection(Direction::LEFT);
-					else if (pacman->direction() == Direction::RIGHT) {
-						pacman->setDirection(Direction::LEFT);
-						pacman->updateSpeedVec(Game::createSpeedVec(pacman->speed(), pacman->direction()));
-						if (pacman->nextDirection() != -1)
-							pacman->setNextDirection(-1);
-					}
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
 	
 					break;
 				case sf::Keyboard::Right:
-					if (pacman->direction() == Direction::UP || pacman->direction() == Direction::DOWN)
+					if (pacman->direction() != Direction::RIGHT)
 						pacman->setNextDirection(Direction::RIGHT);
-					else if (pacman->direction() == Direction::LEFT) {
-						pacman->setDirection(Direction::RIGHT);
-						pacman->updateSpeedVec(Game::createSpeedVec(pacman->speed(), pacman->direction()));
-						if (pacman->nextDirection() != -1)
-							pacman->setNextDirection(-1);
-					}
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
+
 					break;
 				case sf::Keyboard::Up:
-					if (pacman->direction() == Direction::LEFT || pacman->direction() == Direction::RIGHT)
+					if (pacman->direction() != Direction::UP)
 						pacman->setNextDirection(Direction::UP);
-					else if (pacman->direction() == Direction::DOWN) {
-						pacman->setDirection(Direction::UP);
-						pacman->updateSpeedVec(Game::createSpeedVec(pacman->speed(), pacman->direction()));
-						if (pacman->nextDirection() != -1)
-							pacman->setNextDirection(-1);
-					}
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
+
 					break;
 				case sf::Keyboard::Down:
-					if (pacman->direction() == Direction::LEFT || pacman->direction() == Direction::RIGHT)
+					if (pacman->direction() != Direction::DOWN)
 						pacman->setNextDirection(Direction::DOWN);
-					else if (pacman->direction() == Direction::UP) {
-						pacman->setDirection(Direction::DOWN);
-						pacman->updateSpeedVec(Game::createSpeedVec(pacman->speed(), pacman->direction()));
-						if (pacman->nextDirection() != -1)
-							pacman->setNextDirection(-1);
-					}
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
+
 					break;
 				default:
 					break;
@@ -155,18 +150,22 @@ int main()
 
 		}
 
-		TileMap* currentMap = game.currentLevel(); // ”казатель на текущий уровень.
+		
 		Ghost** ghosts = game.ghosts();
 		
 		// ќчищаем окно.
 		window.clear();
 		// –исуем уровень.
+		
 		window.draw(*currentMap);
 		// –исуем пакмена.
+		
+		pacman->setPosition(Game::getGlobalPosition(pacman->coords(), game.currentLevel()));
 		window.draw(*pacman);
-		std::cout << "x: " << pacman->coords().x << "; y: " << pacman->coords().y << std::endl;
 		// –исуем призраков.
 		for (int i = 0; i < Game::GHOST_COUNT; i++) {
+			Ghost* ghost = ghosts[i];
+			ghost->setPosition(Game::getGlobalPosition(ghost->coords(), game.currentLevel()));
 			window.draw(*(ghosts[i]));
 		}
 

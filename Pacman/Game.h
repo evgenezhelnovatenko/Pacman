@@ -35,6 +35,7 @@ public:
 	void startLogicThread();
 	void startAnimationThread();
 	
+	
 
 	static sf::Vector2f getNewCoords(sf::Vector2f currentCoords, sf::Vector2f speedVec);
 	static bool isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords);
@@ -42,8 +43,10 @@ public:
 	static sf::Vector2f getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u spriteSize, int direction);
 	static sf::Vector2f getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
 	static sf::Vector2f getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
+	static sf::Vector2f getGlobalPosition(sf::Vector2f currCoords, TileMap* level);
 	
 	static const int GHOST_COUNT{ 4 };
+	static sf::Vector2u windowSize;
 
 private:
 
@@ -63,6 +66,7 @@ private:
 	sf::Texture m_mapTilesetTexture;
 	sf::Texture m_mapPacmanSetTexture;
 	sf::Texture m_mapGhostsSetTexture;
+	
 	int m_levelNumber; // Номер текущего уровня.
 	int m_animationCounter; // Счётчик кадров анимации.
 	bool m_isWindowOpen; // Флаг, который говорит открыто ли окно программы.

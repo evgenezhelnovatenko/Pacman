@@ -54,6 +54,12 @@ void Pacman::updateTheCurrentDirectionToTheNext()
 	m_nextDirection = -1;
 }
 
+void Pacman::loadSprite()
+{
+	m_sprite.setTexture(*m_texture);
+	m_sprite.setTextureRect(sf::IntRect(0, 0, m_spriteSize.x, m_spriteSize.y));
+}
+
 int Pacman::nextDirection()
 {
 	return m_nextDirection;

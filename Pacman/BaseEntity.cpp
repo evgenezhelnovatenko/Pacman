@@ -1,11 +1,5 @@
 #include "BaseEntity.h"
 
-void BaseEntity::loadSprite()
-{
-	m_sprite.setTexture(*m_texture);
-	m_sprite.setTextureRect(sf::IntRect(0, 0, m_spriteSize.x, m_spriteSize.y));
-}
-
 void BaseEntity::changeTextureRect(sf::IntRect rect)
 {
 	m_sprite.setTextureRect(rect);
@@ -35,6 +29,7 @@ void BaseEntity::setCoords(sf::Vector2f coords)
 		return;
 
 	m_coords = coords;
+
 	setPosition(m_coords);
 }
 

@@ -5,7 +5,7 @@
 
 struct EntityParams
 {
-    EntityParams() {};
+    EntityParams() : direction{0} {};
 
     EntityParams(sf::Vector2f coords, int direction) {
         this->coords = coords;
@@ -33,6 +33,11 @@ public:
     int getTileNumber(sf::Vector2f coords) const;
     int getTileValue(const int &tileNumber) const;  
     sf::Vector2f getTileCoords(int tileNumber);
+    sf::VertexArray* vertices();
+    unsigned int width();
+    unsigned int height();
+    int widthInPixels();
+    int heightInPixels();
     EntityParams* pacmanParams();
     EntityParams* ghostsParams();
 
