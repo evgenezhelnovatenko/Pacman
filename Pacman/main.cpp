@@ -17,6 +17,20 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(512, 450), "Pac-man");
 	window.setFramerateLimit(60);
 
+	sf::Text scoreText;
+	sf::Font font;
+
+	if (!font.loadFromFile("fonts/sunday.ttf")) {
+		return -1;
+	}
+
+	scoreText.setFont(font);
+	scoreText.setFillColor(sf::Color::Red);
+	scoreText.setLetterSpacing(2.5);
+	scoreText.setStyle(sf::Text::Italic);
+	scoreText.setString("000000");
+	scoreText.setPosition(window.getSize().x - 160, 0);
+
 	Game game("images/map_tileset.png", "images/pacman_spriteSet.png", "images/ghosts_spriteSet.png");
 
 	Game::windowSize = window.getSize();
@@ -25,18 +39,18 @@ int main()
 	int level1[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
-		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
-		12,	22,	18,	22, 11, 19, 22, 21, 9,	22, 11, 20, 20, 19,	22, 13,
-		12,	22,	17,	22, 17, 22, 22, 22, 17, 22, 17, 22, 22, 22,	22, 13,
-		12,	22,	17,	22, 17, 22, 22, 22, 17, 22, 17, 22, 11, 19,	22, 13,
-		12,	22,	16,	22, 10, 20, 20, 20, 8,	22, 16, 22, 17, 22,	22, 13,
-		12,	22,	22,	22,	22, 22, 22, 22,	22,	22, 22, 22, 10,	9,	22,	13,
-		12,	22,	11,	20, 20, 20, 20, 20, 20, 20, 9,	22,	22, 17,	22,	13,
-		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 10, 9,	22, 17, 22,	13,
-		12,	22,	17,	22, 22, 22, 22, 22, 22, 22, 22, 17, 22, 17,	22,	13,
-		12,	22,	10,	20, 20, 20, 20, 20, 20, 20, 20,	8,	22, 16,	22,	13,
-		12,	22,	22, 22, 22,	22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
-		6,	15,	15,	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,	15,	4
+		12,	46,	46, 46, 46, 46, 46, 46,	46,	46,	46,	46,	46,	46,	46,	13,
+		12,	46,	18,	46, 11, 19, 47, 21, 9,	46, 11, 20, 20, 19,	46, 13,
+		12,	46,	17,	46, 17, 47, 47, 47, 17, 46, 17, 46, 46, 46,	46, 13,
+		12,	46,	17,	46, 17, 47, 47, 47, 17, 46, 17, 46, 11, 19,	46, 13,
+		12,	46,	16,	46, 10, 20, 20, 20, 8,	46, 16, 46, 17, 46,	46, 13,
+		12,	46,	46,	46,	46, 46, 46, 46,	46,	46, 46, 46, 10,	9,	46,	13,
+		30,	19,	46,	11, 20, 20, 20, 37, 15, 15,	1,	46,	46, 17,	46,	13,
+		12,	46,	46,	17, 46, 46, 46, 13, 7,	14,	36, 1,	46, 17, 46,	13,
+		12,	46,	11,	8,	46, 45, 46, 2,	42, 46,	2,	0,	46, 17,	46,	13,
+		12,	46,	16,	46, 46, 46, 46, 46, 16, 46, 46,	46,	46, 16,	46,	13,
+		12,	46,	46, 46, 3,	15, 1,	46,	46,	46,	3,	1,	46,	46,	46,	13,
+		6,	15,	15,	15, 4,	47, 6,	15, 15, 15, 4,	6, 15, 15,	15,	4
 	};
 	EntityParams ghostsPrmsForLvl1[] = {
 		EntityParams(sf::Vector2f(150, 90), Direction::RIGHT),
@@ -48,12 +62,12 @@ int main()
 	int level2[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
-		12,	22,	22, 22, 22, 22, 22, 22,	22,	22,	22,	22,	22,	22,	22,	13,
-		12,	22,	11,	20,	20,	20,	20, 20, 20, 20, 20, 20, 20, 9,	22, 13,
-		12,	22,	17,	22, 22, 22, 22, 13, 22, 22, 22, 22, 22, 17,	22, 13,
-		12,	22,	17,	22, 22, 22, 22, 13, 22, 22, 22, 22, 22, 17,	22, 13,
-		12,	22,	10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 8,	22, 13,
-		12,	22,	22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 13,
+		12,	46,	46, 46, 46, 46, 46, 46,	46,	46,	46,	46,	46,	46,	46,	13,
+		12,	46,	11,	20,	20,	20,	20, 20, 20, 20, 20, 20, 20, 9,	46, 13,
+		12,	46,	17,	46, 46, 46, 46, 13, 46, 46, 46, 46, 46, 17,	46, 13,
+		12,	46,	17,	46, 46, 46, 46, 13, 46, 46, 46, 46, 46, 17,	46, 13,
+		12,	46,	10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 8,	46, 13,
+		12,	46,	46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 13,
 		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
 	};
 	EntityParams ghostsPrmsForLvl2[] = {
@@ -71,17 +85,7 @@ int main()
 
 	TileMap* currentMap = game.currentLevel(); // Указатель на текущий уровень.
 
-	sf::VertexArray* mapVertices = currentMap->vertices();
-	for (unsigned int i = 0; i < currentMap->width(); ++i) {
-		for (unsigned int j = 0; j < currentMap->height(); ++j) {
-			sf::Vertex* quad = &(*mapVertices)[(i + j * currentMap->width()) * 4];
-
-			quad[0].position = Game::getGlobalPosition(quad[0].position, game.currentLevel());
-			quad[1].position = Game::getGlobalPosition(quad[1].position, game.currentLevel());
-			quad[2].position = Game::getGlobalPosition(quad[2].position, game.currentLevel());
-			quad[3].position = Game::getGlobalPosition(quad[3].position, game.currentLevel());
-		}
-	}
+	Game::centeringTheMap(currentMap);
 
 	Pacman* pacman = game.pacman();
 
@@ -109,6 +113,8 @@ int main()
 					
 					if (pacman->direction() != Direction::LEFT)
 						pacman->setNextDirection(Direction::LEFT);
+					else
+						pacman->setNextDirection(-1);
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
@@ -117,6 +123,8 @@ int main()
 				case sf::Keyboard::Right:
 					if (pacman->direction() != Direction::RIGHT)
 						pacman->setNextDirection(Direction::RIGHT);
+					else
+						pacman->setNextDirection(-1);
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
@@ -125,6 +133,8 @@ int main()
 				case sf::Keyboard::Up:
 					if (pacman->direction() != Direction::UP)
 						pacman->setNextDirection(Direction::UP);
+					else
+						pacman->setNextDirection(-1);
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
@@ -133,6 +143,8 @@ int main()
 				case sf::Keyboard::Down:
 					if (pacman->direction() != Direction::DOWN)
 						pacman->setNextDirection(Direction::DOWN);
+					else
+						pacman->setNextDirection(-1);
 
 					if (pacman->isStandStill())
 						pacman->setIsStandStill(false);
@@ -153,21 +165,24 @@ int main()
 		
 		Ghost** ghosts = game.ghosts();
 		
-		// Очищаем окно.
+		// Clean the window.
 		window.clear();
-		// Рисуем уровень.
-		
+		// Drawing level.
+		currentMap->updateVertexArray();
+		Game::centeringTheMap(currentMap);
 		window.draw(*currentMap);
-		// Рисуем пакмена.
-		
+		// Drawing pacman.
 		pacman->setPosition(Game::getGlobalPosition(pacman->coords(), game.currentLevel()));
 		window.draw(*pacman);
-		// Рисуем призраков.
+		// Drawing ghosts.
 		for (int i = 0; i < Game::GHOST_COUNT; i++) {
 			Ghost* ghost = ghosts[i];
 			ghost->setPosition(Game::getGlobalPosition(ghost->coords(), game.currentLevel()));
 			window.draw(*(ghosts[i]));
 		}
+		// Drawing scoreText
+		scoreText.setString(Game::convertIntToString(pacman->score, scoreText.getString().getSize()));
+		window.draw(scoreText);
 
 		window.display();
 	}

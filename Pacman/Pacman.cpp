@@ -1,13 +1,17 @@
 #include "Pacman.h"
 
 Pacman::Pacman()
-	: m_isStandStill{ true }
+	: score{ 0 }
+	, m_isStandStill{ true }
+	, m_maxScore{ 0 }
 {
 
 }
 
 Pacman::Pacman(sf::Vector2u spriteSize, float speed)
-	: m_isStandStill{ true }
+	: score{ 0 }
+	, m_isStandStill{ true }
+	, m_maxScore{ 0 }
 {
 	m_nextDirection = -1;
 	m_spriteSize = spriteSize;
@@ -15,7 +19,9 @@ Pacman::Pacman(sf::Vector2u spriteSize, float speed)
 }
 
 Pacman::Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, float speed, int direction, sf::Vector2f speedVec)
-	: m_isStandStill{true}
+	: score{ 0 }
+	, m_isStandStill{ true }
+	, m_maxScore{ 0 }
 {
 	m_coords = coords;
 	m_direction = direction;

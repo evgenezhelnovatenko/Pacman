@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <iostream>
 
 #include "TileMap.h"
@@ -20,7 +21,7 @@ public:
 	~Game();
 
 	bool setup();
-	void levelPreparation(int levelNumb);
+	bool levelPreparation(int levelNumb);
 	
 	void addLevel(TileMap* newLevel);
 	TileMap* currentLevel();
@@ -40,10 +41,13 @@ public:
 	static sf::Vector2f getNewCoords(sf::Vector2f currentCoords, sf::Vector2f speedVec);
 	static bool isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords);
 	static sf::Vector2f createSpeedVec(float pixelsPerSecond, int direction);
-	static sf::Vector2f getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u spriteSize, int direction);
+	static sf::Vector2f getCenterPoint(sf::Vector2f spriteCoords, sf::Vector2u spriteSize);
+	static sf::Vector2f getForwardCenterPoint(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int direction);
 	static sf::Vector2f getABackPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
 	static sf::Vector2f getAFrontPointInTheDirectionOfTheNextTurn(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int currentDirection, int nextDirection);
 	static sf::Vector2f getGlobalPosition(sf::Vector2f currCoords, TileMap* level);
+	static sf::Vector2f centeringTheMap(TileMap* level);
+	static std::string convertIntToString(int input, int numberOfDigitsInALine);
 	
 	static const int GHOST_COUNT{ 4 };
 	static sf::Vector2u windowSize;

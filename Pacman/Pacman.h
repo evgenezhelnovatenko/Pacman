@@ -11,6 +11,8 @@ public:
 	Pacman(sf::Vector2u spriteSize, float speed);
 	Pacman(sf::Vector2f coords, sf::Vector2u spriteSize, float speed, int direction, sf::Vector2f speedVec);
 
+	int score;
+
 	bool isStandStill();
 	void setIsStandStill(bool isStandStill);
 	int nextDirection();
@@ -22,6 +24,7 @@ public:
 
 private:
 	bool m_isStandStill;
-
+	
+	int m_maxScore;
 };
 

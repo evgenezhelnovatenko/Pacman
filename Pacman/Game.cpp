@@ -44,15 +44,17 @@ bool Game::setup()
 
 	loadSprites();
 
-	levelPreparation(m_levelNumber);
+	if (!levelPreparation(m_levelNumber))
+		return false;
 
 	return true;
 }
 
 // Подготовка уровня.
-void Game::levelPreparation(int levelNumb)
+bool Game::levelPreparation(int levelNumb)
 {
-	loadMapForLvl(levelNumb);
+	if (!loadMapForLvl(levelNumb))
+		return false;
 	pacmanSetupForLvl(levelNumb);
 	ghostsSetupForLvl(levelNumb);
 }
@@ -204,6 +206,16 @@ void Game::logic() {
 					m_pacman->direction()));
 				newPacmanCoords = currentMap->getTileCoords(tileNumber);
 			}
+
+			sf::Vector2f pacmanCenterPoint = getCenterPoint(m_pacman->coords(), m_pacman->spriteSize());
+			int tileNumber = currentMap->getTileNumber(pacmanCenterPoint);
+			int tileValue = currentMap->getTileValue(tileNumber);
+
+			if (tileValue == TileMap::DOTTED_CELL) {
+				currentMap->replacingADottedCellWithAnEmptyCell(tileNumber);
+				//std::cout << currentMap->getTileValue(tileNumber);
+				m_pacman->score++;
+			}
 			// Двигаем его по новым кооридинатам.
 			m_pacman->moveTo(newPacmanCoords);
 		}
@@ -317,7 +329,7 @@ bool Game::isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords)
 	int tileNumber = map.getTileNumber(coords);
 	int tileValue = map.getTileValue(tileNumber);
 
-	if (tileValue != 22)
+	if (tileValue != TileMap::DOTTED_CELL && tileValue != TileMap::EMPTY_CELL)
 		return true;
 
 	return false;
@@ -351,30 +363,36 @@ sf::Vector2f Game::createSpeedVec(float pixelsPerSecond, int direction)
 	return speedVec;
 }
 
+sf::Vector2f Game::getCenterPoint(sf::Vector2f spriteCoords, sf::Vector2u spriteSize)
+{
+
+	return sf::Vector2f(spriteCoords.x + spriteSize.x / 2, spriteCoords.y + spriteSize.y / 2);
+}
+
 // Получить центральную переднюю точку спрайта по его координатам, размеру и направлению.
-sf::Vector2f Game::getForwardCenterPoint(sf::Vector2f entityCoords, sf::Vector2u spriteSize, int direction)
+sf::Vector2f Game::getForwardCenterPoint(sf::Vector2f spriteCoords, sf::Vector2u spriteSize, int direction)
 {
 	switch (direction)
 	{
 	case Direction::LEFT:
-		entityCoords.y += spriteSize.y / 2;
+		spriteCoords.y += spriteSize.y / 2;
 		break;
 	case Direction::RIGHT:
-		entityCoords.x += spriteSize.x - 1;
-		entityCoords.y += spriteSize.y / 2;
+		spriteCoords.x += spriteSize.x - 1;
+		spriteCoords.y += spriteSize.y / 2;
 		break;
 	case Direction::UP:
-		entityCoords.x += spriteSize.x / 2;
+		spriteCoords.x += spriteSize.x / 2;
 		break;
 	case Direction::DOWN:
-		entityCoords.x += spriteSize.x / 2;
-		entityCoords.y += spriteSize.y - 1;
+		spriteCoords.x += spriteSize.x / 2;
+		spriteCoords.y += spriteSize.y - 1;
 		break;
 	default:
 		break;
 	}
 
-	return entityCoords;
+	return spriteCoords;
 }
 
 // Получить заднюю точку спрайта по его следующему направлению, координатам и размеру.
@@ -473,4 +491,40 @@ sf::Vector2f Game::getGlobalPosition(sf::Vector2f currCoords, TileMap* level)
 	currCoords.y += valueToAddToHeight;
 
 	return currCoords;
+}
+
+sf::Vector2f Game::centeringTheMap(TileMap* level)
+{
+	sf::VertexArray* mapVertices = level->vertices();
+	for (unsigned int i = 0; i < level->width(); ++i) {
+		for (unsigned int j = 0; j < level->height(); ++j) {
+			sf::Vertex* quad = &(*mapVertices)[(i + j * level->width()) * 4];
+
+			quad[0].position = Game::getGlobalPosition(quad[0].position, level);
+			quad[1].position = Game::getGlobalPosition(quad[1].position, level);
+			quad[2].position = Game::getGlobalPosition(quad[2].position, level);
+			quad[3].position = Game::getGlobalPosition(quad[3].position, level);
+		}
+	}
+	return sf::Vector2f();
+}
+
+std::string Game::convertIntToString(int input, int numberOfDigitsInALine)
+{
+	std::string output = "";
+	int intPartOfNumb = input;
+	int lastDigitOfANumber = input;
+
+	for (int j = 0; j < numberOfDigitsInALine; j++) {
+		if (intPartOfNumb != 0) {
+			lastDigitOfANumber = intPartOfNumb % 10;
+			intPartOfNumb /= 10;
+			output.insert(0, std::to_string(lastDigitOfANumber));
+		}
+		else
+			output.insert(0, "0");
+	}
+
+
+	return output;
 }

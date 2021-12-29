@@ -29,10 +29,13 @@ public:
 
     void setTexture(sf::Texture* texture);
     bool load();
+    void populateTheVertexArray();
     void unload();
+    void updateVertexArray();
     int getTileNumber(sf::Vector2f coords) const;
     int getTileValue(const int &tileNumber) const;  
     sf::Vector2f getTileCoords(int tileNumber);
+    void replacingADottedCellWithAnEmptyCell(int tileNumb);
     sf::VertexArray* vertices();
     unsigned int width();
     unsigned int height();
@@ -42,6 +45,9 @@ public:
     EntityParams* ghostsParams();
 
     void setup();
+
+    static const int DOTTED_CELL{ 46 };
+    static const int EMPTY_CELL{ 47 };
 
 private:
 

@@ -1,6 +1,9 @@
 #include "TileMap.h"
 #include <iostream>
 
+const int TileMap::DOTTED_CELL;
+const int TileMap::EMPTY_CELL;
+
 TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height, EntityParams* pacmanParams, EntityParams* ghostsParams)
     : m_tiles{tiles}
     , m_tileset{nullptr}
@@ -27,7 +30,14 @@ bool TileMap::load()
     m_vertices.setPrimitiveType(sf::Quads);
     m_vertices.resize(m_width * m_height * 4);
 
-    // populate the vertex array, with one quad per tile
+    populateTheVertexArray();
+
+    return true;
+}
+
+// Наполнение массива вертексов.
+void TileMap::populateTheVertexArray()
+{
     for (unsigned int i = 0; i < m_width; ++i)
         for (unsigned int j = 0; j < m_height; ++j)
         {
@@ -53,8 +63,6 @@ bool TileMap::load()
             quad[2].texCoords = sf::Vector2f((tu + 1) * m_tileSize.x, (tv + 1) * m_tileSize.y);
             quad[3].texCoords = sf::Vector2f(tu * m_tileSize.x, (tv + 1) * m_tileSize.y);
         }
-
-    return true;
 }
 
 void TileMap::unload()
@@ -62,6 +70,13 @@ void TileMap::unload()
     m_vertices.clear();
     delete m_tileset;
     m_tileset = nullptr;
+}
+
+void TileMap::updateVertexArray()
+{
+    m_vertices.clear();
+    m_vertices.resize(m_width * m_height * 4);
+    populateTheVertexArray();
 }
 
 int TileMap::getTileNumber(sf::Vector2f coords) const
@@ -89,6 +104,11 @@ sf::Vector2f TileMap::getTileCoords(int tileNumber)
     int j = tileNumber % m_width;
 
     return sf::Vector2f(j * m_tileSize.x, i * m_tileSize.y);
+}
+
+void TileMap::replacingADottedCellWithAnEmptyCell(int tileNumb)
+{
+    m_tiles[tileNumb] = EMPTY_CELL;
 }
 
 sf::VertexArray* TileMap::vertices()
