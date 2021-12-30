@@ -5,8 +5,8 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "Game.h"
 #include "Enums.h"
+#include "Game.h"
 
 #define PACMAN_SPEED 100.f
 
@@ -39,10 +39,10 @@ int main()
 	int level1[] =
 	{
 		7,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	14,	5,
-		12,	46,	46, 46, 46, 46, 46, 46,	46,	46,	46,	46,	46,	46,	46,	13,
+		12,	50,	46, 46, 46, 46, 46, 46,	46,	46,	46,	46,	46,	46,	46,	13,
 		12,	46,	18,	46, 11, 19, 47, 21, 9,	46, 11, 20, 20, 19,	46, 13,
-		12,	46,	17,	46, 17, 47, 47, 47, 17, 46, 17, 46, 46, 46,	46, 13,
-		12,	46,	17,	46, 17, 47, 47, 47, 17, 46, 17, 46, 11, 19,	46, 13,
+		12,	46,	17,	46, 17, 51, 47, 51, 17, 46, 17, 46, 46, 46,	46, 13,
+		12,	46,	17,	46, 17, 51, 47, 51, 17, 46, 17, 46, 11, 19,	46, 13,
 		12,	46,	16,	46, 10, 20, 20, 20, 8,	46, 16, 46, 17, 46,	46, 13,
 		12,	46,	46,	46,	46, 46, 46, 46,	46,	46, 46, 46, 10,	9,	46,	13,
 		30,	19,	46,	11, 20, 20, 20, 37, 15, 15,	1,	46,	46, 17,	46,	13,
@@ -52,12 +52,12 @@ int main()
 		12,	46,	46, 46, 3,	15, 1,	46,	46,	46,	3,	1,	46,	46,	46,	13,
 		6,	15,	15,	15, 4,	47, 6,	15, 15, 15, 4,	6, 15, 15,	15,	4
 	};
-	EntityParams ghostsPrmsForLvl1[] = {
+	/*EntityParams ghostsPrmsForLvl1[] = {
 		EntityParams(sf::Vector2f(150, 90), Direction::RIGHT),
 		EntityParams(sf::Vector2f(200, 90), Direction::LEFT),
 		EntityParams(sf::Vector2f(150, 120), Direction::UP),
 		EntityParams(sf::Vector2f(200, 120), Direction::DOWN)
-	};
+	};*/
 
 	int level2[] =
 	{
@@ -70,15 +70,17 @@ int main()
 		12,	46,	46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 46, 13,
 		6,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	15,	4,
 	};
-	EntityParams ghostsPrmsForLvl2[] = {
+	/*EntityParams ghostsPrmsForLvl2[] = {
 		EntityParams(sf::Vector2f(180, 60), Direction::RIGHT),
 		EntityParams(sf::Vector2f(230, 60), Direction::LEFT),
 		EntityParams(sf::Vector2f(180, 90), Direction::UP),
 		EntityParams(sf::Vector2f(230, 90), Direction::DOWN)
-	};
+	};*/
 
-	game.addLevel(new TileMap(sf::Vector2u(30, 30), level1, 16, 13, new EntityParams(sf::Vector2f(30, 30), Direction::RIGHT), ghostsPrmsForLvl1));
-	game.addLevel(new TileMap(sf::Vector2u(30, 30), level2, 16, 8, new EntityParams(sf::Vector2f(200, 30), Direction::RIGHT), ghostsPrmsForLvl2));
+	//game.addLevel(new TileMap(sf::Vector2u(30, 30), level1, 16, 13, new EntityParams(sf::Vector2f(30, 30), Direction::RIGHT), ghostsPrmsForLvl1));
+	//game.addLevel(new TileMap(sf::Vector2u(30, 30), level2, 16, 8, new EntityParams(sf::Vector2f(200, 30), Direction::RIGHT), ghostsPrmsForLvl2));
+	game.addLevel(new TileMap(sf::Vector2u(30, 30), level1, 16, 13, Game::GHOST_COUNT));
+	game.addLevel(new TileMap(sf::Vector2u(30, 30), level2, 16, 8, Game::GHOST_COUNT));
 
 	if (!game.setup())
 		return -1;

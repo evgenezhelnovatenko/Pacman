@@ -3,13 +3,22 @@
 
 const int TileMap::DOTTED_CELL;
 const int TileMap::EMPTY_CELL;
+const int TileMap::PACMAN_CELL;
+const int TileMap::GHOST_CELL;
 
-TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height, EntityParams* pacmanParams, EntityParams* ghostsParams)
-    : m_tiles{tiles}
-    , m_tileset{nullptr}
-    , m_tileSize{tileSize}
-    , m_width{width}
-    , m_height{height}
+TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height, int ghostCount)
+    : m_tiles{ tiles }
+    , m_tileset{ nullptr }
+    , m_tileSize{ tileSize }
+    , m_width{ width }
+    , m_height{ height }
+    , m_pacmanParams{ new EntityParams() }
+    , m_ghostsParams{ new EntityParams[ghostCount] }
+{
+}
+
+TileMap::TileMap(sf::Vector2u tileSize, int* tiles, unsigned int width, unsigned int height, int ghostCount, EntityParams* pacmanParams, EntityParams* ghostsParams)
+    : TileMap (tileSize, tiles, width, height, ghostCount)
 {
     m_pacmanParams = pacmanParams;
     m_ghostsParams = ghostsParams;
@@ -38,18 +47,32 @@ bool TileMap::load()
 // Наполнение массива вертексов.
 void TileMap::populateTheVertexArray()
 {
+    int ghostIndex = -1;
     for (unsigned int i = 0; i < m_width; ++i)
         for (unsigned int j = 0; j < m_height; ++j)
         {
             // get the current tile number
-            int tileNumber = m_tiles[i + j * m_width];
+            int tileIndex = i + j * m_width;
+            int tileNumber = m_tiles[tileIndex];
+
+            if (tileNumber == PACMAN_CELL) {
+                m_pacmanParams->coords = getTileCoords(tileIndex);
+                m_pacmanParams->direction = Direction::RIGHT;
+                replacingTileNumber(tileIndex, EMPTY_CELL);
+            }
+            else if (tileNumber == GHOST_CELL) {
+                ghostIndex++;
+                m_ghostsParams[ghostIndex].coords = getTileCoords(tileIndex);
+                m_ghostsParams[ghostIndex].direction = ghostIndex;
+                replacingTileNumber(tileIndex, EMPTY_CELL);
+            }
 
             // find its position in the tileset texture
             int tu = tileNumber % (m_tileset->getSize().x / m_tileSize.x);
             int tv = tileNumber / (m_tileset->getSize().x / m_tileSize.x);
 
             // get a pointer to the current tile's quad
-            sf::Vertex* quad = &m_vertices[(i + j * m_width) * 4];
+            sf::Vertex* quad = &m_vertices[tileIndex * 4];
 
             // define its 4 corners
             quad[0].position = sf::Vector2f(i * m_tileSize.x, j * m_tileSize.y);
@@ -79,7 +102,7 @@ void TileMap::updateVertexArray()
     populateTheVertexArray();
 }
 
-int TileMap::getTileNumber(sf::Vector2f coords) const
+int TileMap::getTileIndex(sf::Vector2f coords) const
 {
     int i = coords.y / m_tileSize.y;
     int j = coords.x / m_tileSize.x;
@@ -88,27 +111,27 @@ int TileMap::getTileNumber(sf::Vector2f coords) const
     return i * m_width + j;
 }
 
-int TileMap::getTileValue(const int &tileNumber) const
+int TileMap::getTileNumber(const int &tileIndex) const
 {
-    if (tileNumber < 0 || tileNumber >= m_width * m_height) {
+    if (tileIndex < 0 || tileIndex >= m_width * m_height) {
         std::cout << "Going beyond the boundaries of the map ";
         return -1;
     }
 
-    return m_tiles[tileNumber];
+    return m_tiles[tileIndex];
 }
 
-sf::Vector2f TileMap::getTileCoords(int tileNumber)
+sf::Vector2f TileMap::getTileCoords(int tileIndex)
 {
-    int i = tileNumber / m_width;
-    int j = tileNumber % m_width;
+    int i = tileIndex / m_width;
+    int j = tileIndex % m_width;
 
     return sf::Vector2f(j * m_tileSize.x, i * m_tileSize.y);
 }
 
-void TileMap::replacingADottedCellWithAnEmptyCell(int tileNumb)
+void TileMap::replacingTileNumber(int tileIndex, int newTileNumber)
 {
-    m_tiles[tileNumb] = EMPTY_CELL;
+    m_tiles[tileIndex] = newTileNumber;
 }
 
 sf::VertexArray* TileMap::vertices()
@@ -144,11 +167,6 @@ EntityParams* TileMap::pacmanParams()
 EntityParams* TileMap::ghostsParams()
 {
     return m_ghostsParams;
-}
-
-void TileMap::setup()
-{
-    
 }
 
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const

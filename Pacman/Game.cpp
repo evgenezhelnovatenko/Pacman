@@ -201,19 +201,18 @@ void Game::logic() {
 			// Если препятствие есть, то задаём Пакмену координаты плитки, на которой он стоял.
 			if (isThereAnObstacleOnTheCoords(*currentMap, coordsToCheck)) {
 				m_pacman->setIsStandStill(true);
-				int tileNumber = currentMap->getTileNumber(getForwardCenterPoint(m_pacman->coords(),
+				int tileIndex = currentMap->getTileIndex(getForwardCenterPoint(m_pacman->coords(),
 					m_pacman->spriteSize(),
 					m_pacman->direction()));
-				newPacmanCoords = currentMap->getTileCoords(tileNumber);
+				newPacmanCoords = currentMap->getTileCoords(tileIndex);
 			}
 
 			sf::Vector2f pacmanCenterPoint = getCenterPoint(m_pacman->coords(), m_pacman->spriteSize());
-			int tileNumber = currentMap->getTileNumber(pacmanCenterPoint);
-			int tileValue = currentMap->getTileValue(tileNumber);
+			int tileIndex = currentMap->getTileIndex(pacmanCenterPoint);
+			int tileNumber = currentMap->getTileNumber(tileIndex);
 
-			if (tileValue == TileMap::DOTTED_CELL) {
-				currentMap->replacingADottedCellWithAnEmptyCell(tileNumber);
-				//std::cout << currentMap->getTileValue(tileNumber);
+			if (tileNumber == TileMap::DOTTED_CELL) {
+				currentMap->replacingTileNumber(tileIndex, TileMap::EMPTY_CELL);
 				m_pacman->score++;
 			}
 			// Двигаем его по новым кооридинатам.
@@ -326,10 +325,10 @@ sf::Vector2f Game::getNewCoords(sf::Vector2f currentCoords, sf::Vector2f speedVe
 // Проверка на то, есть ли по заданым координатам препятствие.
 bool Game::isThereAnObstacleOnTheCoords(const TileMap& map, sf::Vector2f coords)
 {
-	int tileNumber = map.getTileNumber(coords);
-	int tileValue = map.getTileValue(tileNumber);
+	int tileIndex = map.getTileIndex(coords);
+	int tileNumber = map.getTileNumber(tileIndex);
 
-	if (tileValue != TileMap::DOTTED_CELL && tileValue != TileMap::EMPTY_CELL)
+	if (tileNumber != TileMap::DOTTED_CELL && tileNumber != TileMap::EMPTY_CELL)
 		return true;
 
 	return false;
